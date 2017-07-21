@@ -35,11 +35,11 @@
     "dataSource": "mongo",
     "public": false
   },
-  "producto": {
-    "dataSource": "mongo",
-    "public": false
-  },
   "usuario": {
+    "dataSource": "mongo",
+    "public": true
+  },
+  "Cliente": {
     "dataSource": "mongo",
     "public": true
   }

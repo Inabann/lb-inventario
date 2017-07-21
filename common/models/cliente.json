@@ -1,5 +1,5 @@
 {
-  "name": "producto",
+  "name": "Cliente",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
@@ -9,17 +9,20 @@
     "nombre": {
       "type": "string",
       "required": true
+    },
+    "dni_ruc": {
+      "type": "string",
+      "required": true
+    },
+    "telefono": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
     }
   },
   "validations": [],
   "relations": {},
-  "acls": [
-    {
-      "accessType": "*",
-      "principalType": "ROLE",
-      "principalId": "admin",
-      "permission": "ALLOW"
-    }
-  ],
+  "acls": [],
   "methods": {}
 }
