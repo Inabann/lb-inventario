@@ -1,31 +1,38 @@
 {
-  "name": "Cliente",
+  "name": "DetalleVenta",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
     "validateUpsert": true
   },
   "properties": {
-    "nombre": {
-      "type": "string",
+    "fecha_venta": {
+      "type": "date",
       "required": true
     },
-    "dni_ruc": {
-      "type": "string",
-      "required": true
-    },
-    "telefono": {
+    "tipo": {
       "type": "string"
     },
-    "email": {
+    "costo_envio": {
+      "type": "number"
+    },
+    "total": {
+      "type": "number"
+    },
+    "direccion": {
       "type": "string"
     }
   },
   "validations": [],
   "relations": {
-    "detalleVenta": {
+    "venta": {
       "type": "hasMany",
-      "model": "DetalleVenta",
+      "model": "Venta",
+      "foreignKey": ""
+    },
+    "cliente": {
+      "type": "belongsTo",
+      "model": "Cliente",
       "foreignKey": ""
     }
   },

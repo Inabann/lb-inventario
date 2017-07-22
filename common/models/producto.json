@@ -1,0 +1,48 @@
+{
+  "name": "Producto",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "fecha_ingreso": {
+      "type": "date",
+      "required": true
+    },
+    "precio_uni": {
+      "type": "number",
+      "required": true
+    },
+    "cantidad": {
+      "type": "number",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {
+
+    "colors": {
+      "type": "belongsTo",
+      "model": "Color",
+      "foreignKey": ""
+    },
+    "marcas": {
+      "type": "belongsTo",
+      "model": "Marca",
+      "foreignKey": ""
+    },
+    "modelos": {
+      "type": "belongsTo",
+      "model": "Modelo",
+      "foreignKey": ""
+    },
+    "tipos": {
+      "type": "belongsTo",
+      "model": "Tipo",
+      "foreignKey": ""
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

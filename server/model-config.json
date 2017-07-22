@@ -42,5 +42,33 @@
   "Cliente": {
     "dataSource": "mongo",
     "public": true
+  },
+  "Venta": {
+    "dataSource": "mongo",
+    "public": true
+  },
+  "Modelo": {
+    "dataSource": "mongo",
+    "public": true
+  },
+  "Color": {
+    "dataSource": "mongo",
+    "public": true
+  },
+  "Marca": {
+    "dataSource": "mongo",
+    "public": true
+  },
+  "Tipo": {
+    "dataSource": "mongo",
+    "public": true
+  },
+  "Producto": {
+    "dataSource": "mongo",
+    "public": true
+  },
+  "DetalleVenta": {
+    "dataSource": "mongo",
+    "public": true
   }
 }
