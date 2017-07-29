@@ -8,7 +8,9 @@
   "properties": {
     "nombre": {
       "type": "string",
-      "required": true
+      "required": true,
+      "id": true,
+      "generated": false
     }
   },
   "validations": [],

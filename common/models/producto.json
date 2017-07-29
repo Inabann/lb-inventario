@@ -21,7 +21,6 @@
   },
   "validations": [],
   "relations": {
-
     "colors": {
       "type": "belongsTo",
       "model": "Color",
