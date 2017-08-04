@@ -30,16 +30,17 @@ module.exports = function(Producto) {
 				data.forEach(producto => {
 					if(producto.cantidad_res >= porReducir){//si la cantidad por reducir es menor q la cantidad restante
 						producto.cantidad_res -= porReducir;
-						Producto.upsertWithWhere({where: {id: producto.id}}, producto, (err, res) => {
-							if(err) return;
+						Producto.replaceById(producto.id, producto, (err, res) => {
+							if(err) console.log(err);
 							//ya q es menor o igual.. porReducir se vuelve 0, porq va a reducir todo de un solo producto
 							porReducir = 0;
 						})
+						porReducir = 0;
 					} else if (producto.cantidad_res < porReducir){
 						porReducir -= producto.cantidad_res;
 						producto.cantidad_res = 0;
-						Producto.upsertWithWhere({where: {id: producto.id}}, producto, (err, res) => {
-							if(err) return;
+						Producto.replaceById(producto.id , producto, (err, res) => {
+							if(err) console.log(err);
 							return;
 						})
 					} else if(porReducir = 0){
