@@ -12,9 +12,13 @@
     },
     "precio_uni": {
       "type": "number",
-      "required": true
+      "required": false
     },
     "cantidad": {
+      "type": "number",
+      "required": true
+    },
+    "cantidad_res": {
       "type": "number",
       "required": true
     }
