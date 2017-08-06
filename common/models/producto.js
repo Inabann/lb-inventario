@@ -23,6 +23,7 @@ module.exports = function(Producto) {
   });
 
 	Producto.reducir = function(venta, cb){
+		console.log(venta);
 		let porReducir = venta.cantidad;
 		Producto.find({order: 'fecha_ingreso ASC', where: { and: [{modelosId: venta.modelo}, {colorsId: venta.color}, {tiposId: venta.tipo}, {marcasId: venta.marca}] }}, 
 			function(err, data){
@@ -52,7 +53,7 @@ module.exports = function(Producto) {
 	}
 
 	Producto.remoteMethod('reducir', {
-		accepts: {arg: 'venta', type: 'object'},
+		accepts: { arg: 'venta', type: 'object', http: { source: 'body' } },
 		returns: {arg: 'data', type: ['object'], root: true}
 	})
 

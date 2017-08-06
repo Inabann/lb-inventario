@@ -21,9 +21,24 @@
       "model": "DetalleVenta",
       "foreignKey": ""
     },
-    "productos": {
+    "colors": {
       "type": "belongsTo",
-      "model": "Producto",
+      "model": "Color",
+      "foreignKey": ""
+    },
+    "marcas": {
+      "type": "belongsTo",
+      "model": "Marca",
+      "foreignKey": ""
+    },
+    "modelos": {
+      "type": "belongsTo",
+      "model": "Modelo",
+      "foreignKey": ""
+    },
+    "tipos": {
+      "type": "belongsTo",
+      "model": "Tipo",
       "foreignKey": ""
     }
   },
