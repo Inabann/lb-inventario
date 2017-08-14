@@ -12,6 +12,10 @@
     },
     "subtotal": {
       "type": "number"
+    },
+    "fecha_venta": {
+      "type": "date",
+      "required": true
     }
   },
   "validations": [],
