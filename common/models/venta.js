@@ -5,24 +5,31 @@ module.exports = function(Venta) {
 	Venta.getDataSource().connector.connect(function(err, db) {
 	  let ventaCollection = db.collection('Venta');
 	  ventaCollection.aggregate([
-	  	{
-	  		$sort : { fecha_venta: -1}
-	  	},
 	  	{ $project: { 
 	  		cantidad: 1,
+	  		fecha_venta: 1,
         month: { $month: "$fecha_venta" },
         year: { $year: "$fecha_venta" }
     	}},
 	    { $group: {
 	      _id: { year: "$year", month: "$month" },
-	    	total: { $sum: "$cantidad" }
+	    	total: { $sum: "$cantidad" },
+	    	fecha: {$first: "$fecha_venta" }
 	    }}
 		  ], function(err, data) {
 		    if (err) cb(err); //return callback(err);
 		    let meses = [];
 		    let cantidad = [];
+		    data.sort(function(a, b){
+			    var keyA = new Date(a.fecha),
+			        keyB = new Date(b.fecha);
+			    // Compare the 2 dates
+			    if(keyA < keyB) return -1;
+			    if(keyA > keyB) return 1;
+			    return 0;
+				});
 		    data.forEach(venta => {
-					if(venta._id.month == 1) meses.push('Enero')
+					if(venta._id.month == 1) meses[0] = ('Enero')
 					else if(venta._id.month == 2) meses.push('Febrero')
 					else if(venta._id.month == 3) meses.push('Marzo')
 					else if(venta._id.month == 4) meses.push('Abril')
@@ -35,7 +42,7 @@ module.exports = function(Venta) {
 					else if(venta._id.month == 11) meses.push('Noviembre')
 					else if(venta._id.month == 12) meses.push('Diciembre')
 					cantidad.push(venta.total)	
-				})
+				});
 				let newData = {};
 				newData.meses = meses;
 				newData.cantidad = cantidad;

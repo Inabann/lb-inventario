@@ -6,22 +6,29 @@ module.exports = function(Detalleventa) {
 		Detalleventa.getDataSource().connector.connect((err, db) => {
 			let detalleVentaCollection = db.collection('DetalleVenta');
 			detalleVentaCollection.aggregate([
-				{
-		  		$sort : { fecha_venta: -1}
-		  	},
 		  	{ $project: { 
 		  		total: 1,
+		  		fecha_venta: 1,
 	        month: { $month: "$fecha_venta" },
 	        year: { $year: "$fecha_venta" }
 	    	}},
 	    	{ $group: {
 		      _id: { year: "$year", month: "$month" },
-		    	vendido: { $sum: "$total" }
+		    	vendido: { $sum: "$total" },
+		    	fecha: { $first: "$fecha_venta"}
 		    }}
 			], (err, data) => {
 				if (err) cb(err);
 				let meses = [];
 		    let cantidad = [];
+		    data.sort(function(a, b){
+			    var keyA = new Date(a.fecha),
+			        keyB = new Date(b.fecha);
+			    // Compare the 2 dates
+			    if(keyA < keyB) return -1;
+			    if(keyA > keyB) return 1;
+			    return 0;
+				});
 		    data.forEach(venta => {
 					if(venta._id.month == 1) meses.push('Enero')
 					else if(venta._id.month == 2) meses.push('Febrero')
