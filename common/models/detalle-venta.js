@@ -95,6 +95,47 @@ module.exports = function(Detalleventa) {
     returns: {arg:'data', type:['object'], root:true}
   });
 
+//vendido los ultimos 7 dias
+	Detalleventa.Vendidopor7Dias = function(cb){
+		Detalleventa.getDataSource().connector.connect((err, db) => {
+			let detalleVentaCollection = db.collection('DetalleVenta')
+			detalleVentaCollection.aggregate([
+				{ $project: { 
+		  		total: 1,
+		  		fecha_venta: 1
+	    	}},
+	    	{ $group: {
+		      _id : { month: { $month: "$fecha_venta" }, day: { $dayOfMonth: "$fecha_venta" }, year: { $year: "$fecha_venta" } },
+		    	vendido: { $sum: "$total" },
+		    	fecha: { $first: "$fecha_venta"}
+		    }}
+			], (err, data) => {
+				data.sort(function(a, b){
+			    var keyA = new Date(a.fecha),
+			        keyB = new Date(b.fecha);
+			    // Compare the 2 dates
+			    if(keyA < keyB) return -1;
+			    if(keyA > keyB) return 1;
+			    return 0;
+				});
+				data = data.slice(-7)
+				let label = []
+				let cantidad = []
+				data.forEach( item => {
+					label.push(item._id.month+'/'+item._id.day)
+					cantidad.push(item.vendido)
+				})
+				let newData = {}
+				newData.label = label
+				newData.cantidad = cantidad
+				cb(null, newData)
+			})
+		})
+	}
 
+	Detalleventa.remoteMethod('Vendidopor7Dias', {
+    //accepts: {arg: 'filter', type: 'object', description: '{"where:{...}, "groupBy": "field"}'},
+    returns: {arg:'data', type:['object'], root:true}
+  });
 
 };

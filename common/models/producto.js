@@ -6,6 +6,7 @@ module.exports = function(Producto) {
 	Producto.getDataSource().connector.connect(function(err, db) {
 	  let productoCollection = db.collection('Producto');
 	  productoCollection.aggregate([
+	  	{ $match: { cantidad_res: { $gt: 0 } }},
 	    { $group: {
 	      _id: { modelo: "$modelosId", tipo: "$tiposId", marca: "$marcasId", color: "$colorsId" },
 	     cantidad: { $sum: "$cantidad_res" }
