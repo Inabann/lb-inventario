@@ -57,12 +57,17 @@ module.exports = function(Venta) {
   });
 
   //producto mas vendido por mes
-  Venta.porProducto = function(cb) {
+  Venta.porProducto = function(fecha, cb) {
 	Venta.getDataSource().connector.connect(function(err, db) {
 	  let ventaCollection = db.collection('Venta');
-	  let d = new Date();
+	  let d = undefined
+	  if( fecha ) {
+	  	d = new Date(fecha);
+	  } else {
+	  	d = new Date();
+	  }
 	  let mes = d.getMonth() +1
-	  let y = d.getFullYear()
+		let y = d.getFullYear()
 	  ventaCollection.aggregate([
 	  	{ $project: { 
 	  		cantidad: 1,
@@ -96,7 +101,7 @@ module.exports = function(Venta) {
 	}
 
 	Venta.remoteMethod('porProducto', {
-    //accepts: {arg: 'filter', type: 'object', description: '{"where:{...}, "groupBy": "field"}'},
+    accepts: {arg: 'fecha', type: 'string' },
     returns: {arg:'data', type:['object'], root:true}
   });
 

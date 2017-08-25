@@ -59,32 +59,33 @@ module.exports = function(Detalleventa) {
 
 	//cantidad vendida hoy
 	Detalleventa.totalHoy = function(cb) {
-		// Venta.getDataSource().connector.connect(function(err, db) {
-	 //  let ventaCollection = db.collection('Venta');
 	  Detalleventa.getDataSource().connector.connect((err, db) => {
 			let detalleVentaCollection = db.collection('DetalleVenta');
 			let date = new Date();
 		  let y = date.getFullYear();
 		  let m = date.getMonth() +1;
-		  // if (m<10) m = '0'+m.toString()
 		  let d = date.getDate();
-		  // let newdate = new Date(y+"-"+m+"-"+d+"T00:00:00Z");
 			detalleVentaCollection.aggregate([
 		  	{ $project: { 
 		  		total: 1,
-		  		fecha_venta: 1, 
+		  		fecha_venta: 1,
+		  		tipo: 1, 
 	        month: { $month: "$fecha_venta" },
-	        year: { $year: "$fecha_venta" }
+	        year: { $year: "$fecha_venta" },
+	        day: { $dayOfMonth: "$fecha_venta" }
 	    	}},
-	    	{ $match : { year : y, month: m } }
+	    	{ $match : { year : y, month: m , day: d} }
 			], (err, data) => {
 				let totalHoy = 0
+				let creditoHoy = 0
 	  		data.forEach(item => {
-	  			if(item.fecha_venta.getDate()+1 == d) totalHoy += Number(item.total)
+  				if(item.tipo == 'credito') creditoHoy += Number(item.total)
+  				totalHoy += Number(item.total) 
 	  		})
 	  		let newData = {}
 	  		newData.fecha = y+ "-"+m+"-"+d
 	  		newData.total = totalHoy
+	  		newData.credito = creditoHoy
 	  		cb(null, newData)
 	  	})
 		})
@@ -135,6 +136,105 @@ module.exports = function(Detalleventa) {
 
 	Detalleventa.remoteMethod('Vendidopor7Dias', {
     //accepts: {arg: 'filter', type: 'object', description: '{"where:{...}, "groupBy": "field"}'},
+    returns: {arg:'data', type:['object'], root:true}
+  });
+
+  Detalleventa.mejorCliente = function(fecha, cb) {
+	Detalleventa.getDataSource().connector.connect(function(err, db) {
+	  let detalleVentaCollection = db.collection('DetalleVenta');
+	  let d = undefined
+	  if( fecha ) {
+	  	d = new Date(fecha);
+	  } else {
+	  	d = new Date();
+	  }
+	  let mes = d.getMonth() +1
+		let y = d.getFullYear()
+	  detalleVentaCollection.aggregate([
+	  	{ $project: { 
+	  		total: 1,
+        month: { $month: "$fecha_venta" },
+        year: { $year: "$fecha_venta" },
+        clienteId: 1
+    	}},
+    	{ $match : { year : y, month: mes } },
+	    { $group: {
+	      _id: { cliente: "$clienteId"},
+	    	total: { $sum: "$total" },
+	    }},
+	    {
+	    	$lookup: {
+          from: "Cliente",
+          localField: "_id.cliente",
+          foreignField: "_id",
+          as: "cliente_nombre"
+        }
+	    },
+	    { $limit : 7 },
+	    {
+	  		$sort : { total: -1}
+	  	}
+		  ], function(err, data) {
+		    if (err) cb(err); //return callback(err);
+		    let clientes = [];
+		    data.forEach(item => {
+					clientes.push({nombre: item.cliente_nombre[0].nombre, dni_ruc: item.cliente_nombre[0].dni_ruc, total: item.total})
+				})
+				let newData = [];
+				newData = clientes;
+		    cb(null, newData); //return callback(null, data);
+		  });
+		});
+	}
+
+	Detalleventa.remoteMethod('mejorCliente', {
+    accepts: {arg: 'fecha', type: 'string' },
+    returns: {arg:'data', type:['object'], root:true}
+  });
+
+//detalleVenta por mes y año
+  Detalleventa.GenerarExcel = function(fecha, cb) {
+	Detalleventa.getDataSource().connector.connect(function(err, db) {
+	  let detalleVentaCollection = db.collection('DetalleVenta');
+	  let d = undefined
+	  if( fecha ) {
+	  	d = new Date(fecha);
+	  } else {
+	  	d = new Date();
+	  }
+	  let mes = d.getMonth() +1
+		let y = d.getFullYear()
+	  detalleVentaCollection.aggregate([
+	  	{ $project: { 
+	  		total: 1,
+        month: { $month: "$fecha_venta" },
+        year: { $year: "$fecha_venta" },
+        clienteId: 1,
+        fecha_venta: 1,
+        costo_envio: 1,
+        direccion: 1
+    	}},
+    	{ $match : { year : y, month: mes } },
+	    {
+	    	$lookup: {
+          from: "Cliente",
+          localField: "clienteId",
+          foreignField: "_id",
+          as: "cliente_nombre"
+        }
+	    },
+	    {
+	  		$sort : { fecha_venta: 1}
+	  	}
+		  ], function(err, data) {
+		    if (err) cb(err); //return callback(err);
+		    cb(null, data); //return callback(null, data);
+		  });
+		});
+	}
+
+	Detalleventa.remoteMethod('GenerarExcel', {
+    accepts: {arg: 'fecha', type: 'string' },
     returns: {arg:'data', type:['object'], root:true}
   });
 

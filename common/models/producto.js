@@ -57,5 +57,59 @@ module.exports = function(Producto) {
 		returns: {arg: 'data', type: ['object'], root: true}
 	})
 
+	Producto.GastadoporMes = function(cb){
+		Producto.getDataSource().connector.connect((err, db) => {
+			let productoCollection = db.collection('Producto');
+			productoCollection.aggregate([
+		  	{ $project: { 
+		  		precio_uni: 1,
+		  		fecha_ingreso: 1,
+	        month: { $month: "$fecha_ingreso" },
+	        year: { $year: "$fecha_ingreso" }
+	    	}},
+	    	{ $group: {
+		      _id: { year: "$year", month: "$month" },
+		    	gastado: { $sum: "$precio_uni" },
+		    	fecha: { $first: "$fecha_ingreso"}
+		    }}
+			], (err, data) => {
+				if (err) cb(err);
+				let meses = [];
+		    let cantidad = [];
+		    data.sort(function(a, b){
+			    var keyA = new Date(a.fecha),
+			        keyB = new Date(b.fecha);
+			    // Compare the 2 dates
+			    if(keyA < keyB) return -1;
+			    if(keyA > keyB) return 1;
+			    return 0;
+				});
+		    data.forEach(venta => {
+					if(venta._id.month == 1) meses.push('Enero')
+					else if(venta._id.month == 2) meses.push('Febrero')
+					else if(venta._id.month == 3) meses.push('Marzo')
+					else if(venta._id.month == 4) meses.push('Abril')
+					else if(venta._id.month == 5) meses.push('Mayo')
+					else if(venta._id.month == 6) meses.push('Junio')
+					else if(venta._id.month == 7) meses.push('Julio')
+					else if(venta._id.month == 8) meses.push('Agosto')
+					else if(venta._id.month == 9) meses.push('Septiembre')
+					else if(venta._id.month == 10) meses.push('Octubre')
+					else if(venta._id.month == 11) meses.push('Noviembre')
+					else if(venta._id.month == 12) meses.push('Diciembre')
+					cantidad.push(venta.gastado)	
+				})
+				let newData = {};
+				newData.label = meses;
+				newData.cantidad = cantidad;
+		    cb(null, newData);
+			})
+		})
+	}
+
+	Producto.remoteMethod('GastadoporMes', {
+    //accepts: {arg: 'filter', type: 'object', description: '{"where:{...}, "groupBy": "field"}'},
+    returns: {arg:'data', type:['object'], root:true}
+  });
 
 };
