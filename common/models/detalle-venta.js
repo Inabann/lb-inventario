@@ -58,7 +58,7 @@ module.exports = function(Detalleventa) {
   });
 
 	//cantidad vendida hoy
-	Detalleventa.totalHoy = function(cb) {
+	Detalleventa.totalHoy = function(userId, cb) {
 	  Detalleventa.getDataSource().connector.connect((err, db) => {
 			let detalleVentaCollection = db.collection('DetalleVenta');
 			let date = new Date();
@@ -69,7 +69,8 @@ module.exports = function(Detalleventa) {
 		  	{ $project: { 
 		  		total: 1,
 		  		fecha_venta: 1,
-		  		tipo: 1, 
+		  		tipo: 1,
+		  		usuarioId: 1, 
 	        month: { $month: "$fecha_venta" },
 	        year: { $year: "$fecha_venta" },
 	        day: { $dayOfMonth: "$fecha_venta" }
@@ -79,8 +80,10 @@ module.exports = function(Detalleventa) {
 				let totalHoy = 0
 				let creditoHoy = 0
 	  		data.forEach(item => {
-  				if(item.tipo == 'credito') creditoHoy += Number(item.total)
-  				totalHoy += Number(item.total) 
+  				if((item.tipo == 'credito')&& (item.usuarioId == userId)) creditoHoy += Number(item.total)
+  				else if(item.usuarioId == userId){
+  					totalHoy += Number(item.total)
+  				}
 	  		})
 	  		let newData = {}
 	  		newData.fecha = y+ "-"+m+"-"+d
@@ -92,7 +95,7 @@ module.exports = function(Detalleventa) {
 	}
 
 	Detalleventa.remoteMethod('totalHoy', {
-    //accepts: {arg: 'filter', type: 'object', description: '{"where:{...}, "groupBy": "field"}'},
+    accepts: {arg: 'userId', type: 'string' },
     returns: {arg:'data', type:['object'], root:true}
   });
 
@@ -178,7 +181,10 @@ module.exports = function(Detalleventa) {
 		    if (err) cb(err); //return callback(err);
 		    let clientes = [];
 		    data.forEach(item => {
-					clientes.push({nombre: item.cliente_nombre[0].nombre, dni_ruc: item.cliente_nombre[0].dni_ruc, total: item.total})
+		    	if(item.cliente_nombre.length == 0) return 
+		    	else {
+						clientes.push({nombre: item.cliente_nombre[0].nombre, dni_ruc: item.cliente_nombre[0].dni_ruc, total: item.total})
+					}
 				})
 				let newData = [];
 				newData = clientes;
@@ -205,7 +211,8 @@ module.exports = function(Detalleventa) {
 	  let mes = d.getMonth() +1
 		let y = d.getFullYear()
 	  detalleVentaCollection.aggregate([
-	  	{ $project: { 
+	  	{ $project: {
+	  		_id: 1, 
 	  		total: 1,
         month: { $month: "$fecha_venta" },
         year: { $year: "$fecha_venta" },
@@ -215,14 +222,28 @@ module.exports = function(Detalleventa) {
         direccion: 1
     	}},
     	{ $match : { year : y, month: mes } },
+    	{
+	    	$lookup: {
+          from: "Venta",
+          localField: "_id",
+          foreignField: "detalleVentaId",
+          as: "productos"
+        }
+	    },
+	    {
+        $unwind: "$productos"
+    	},
 	    {
 	    	$lookup: {
           from: "Cliente",
           localField: "clienteId",
           foreignField: "_id",
-          as: "cliente_nombre"
+          as: "cliente"
         }
 	    },
+	    {
+        $unwind: "$cliente"
+    	},
 	    {
 	  		$sort : { fecha_venta: 1}
 	  	}
@@ -234,6 +255,64 @@ module.exports = function(Detalleventa) {
 	}
 
 	Detalleventa.remoteMethod('GenerarExcel', {
+    accepts: {arg: 'fecha', type: 'string' },
+    returns: {arg:'data', type:['object'], root:true}
+  });
+
+  //deudores por mes
+   Detalleventa.deudoresMes = function(fecha, cb) {
+	Detalleventa.getDataSource().connector.connect(function(err, db) {
+	  let detalleVentaCollection = db.collection('DetalleVenta');
+	  let d = undefined
+	  if( fecha ) {
+	  	d = new Date(fecha);
+	  } else {
+	  	d = new Date();
+	  }
+	  let mes = d.getMonth() +1
+		let y = d.getFullYear()
+	  detalleVentaCollection.aggregate([
+	  	{ $project: { 
+	  		id: "$_id",
+	  		_id: 0,
+	  		costo_envio: 1,
+	  		direccion: 1,
+	  		total: 1,
+	  		fecha_venta: 1,
+        month: { $month: "$fecha_venta" },
+        year: { $year: "$fecha_venta" },
+        clienteId: 1,
+        tipo: 1
+    	}},
+    	{ $match : { year : y, month: mes , tipo: "credito"} },
+	    {
+	    	$lookup: {
+          from: "Cliente",
+          localField: "clienteId",
+          foreignField: "_id",
+          as: "cliente"
+        }
+	    },
+	    {
+        $unwind: "$cliente"
+    	},
+	    {
+	  		$sort : { total: -1}
+	  	},
+	  	{
+	  		$project: {
+	  			month: 0,
+	  			year: 0
+	  		}
+	  	}
+		  ], function(err, data) {
+		    if (err) cb(err); //return callback(err);
+		    cb(null, data); //return callback(null, data);
+		  });
+		});
+	}
+
+	Detalleventa.remoteMethod('deudoresMes', {
     accepts: {arg: 'fecha', type: 'string' },
     returns: {arg:'data', type:['object'], root:true}
   });

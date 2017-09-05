@@ -5,14 +5,32 @@
   "options": {
     "validateUpsert": true
   },
-  "properties": {},
+  "properties": {
+    "email": {
+      "type": {
+        "required": false
+      }
+    }
+  },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "detalleVenta": {
+      "type": "hasMany",
+      "model": "DetalleVenta",
+      "foreignKey": ""
+    }
+  },
   "acls": [
     {
       "accessType": "*",
       "principalType": "ROLE",
       "principalId": "admin",
+      "permission": "ALLOW"
+    },
+    {
+      "accessType": "READ",
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
       "permission": "ALLOW"
     }
   ],

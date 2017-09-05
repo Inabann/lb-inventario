@@ -10,6 +10,9 @@
       "type": "number",
       "required": true
     },
+    "precio_uni": {
+      "type": "number"
+    },
     "subtotal": {
       "type": "number"
     },
