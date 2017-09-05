@@ -18,6 +18,11 @@
       "type": "hasMany",
       "model": "DetalleVenta",
       "foreignKey": ""
+    },
+    "productos": {
+      "type": "hasMany",
+      "model": "Producto",
+      "foreignKey": ""
     }
   },
   "acls": [

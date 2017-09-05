@@ -19,6 +19,9 @@
     },
     "email": {
       "type": "string"
+    },
+    "direccion": {
+      "type": "string"
     }
   },
   "validations": [],
