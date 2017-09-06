@@ -23,6 +23,40 @@ module.exports = function(Producto) {
     returns: {arg:'data', type:['object'], root:true}
   });
 
+  Producto.stockPorUsuario = function(userId,cb) {
+	Producto.getDataSource().connector.connect(function(err, db) {
+	  let productoCollection = db.collection('Producto');
+	  productoCollection.aggregate([
+	  	{ $project: { 
+	  		precio_uni: 1,
+	  		fecha_ingreso: 1,
+        cantidad_res: 1,
+        usuarioId: 1,
+        modelosId: 1, tiposId: 1, marcasId: 1, colorsId: 1
+	    }},
+	  	{ $match: { cantidad_res: { $gt: 0 }}},
+	    { $group: {
+	      _id: { modelo: "$modelosId", tipo: "$tiposId", marca: "$marcasId", color: "$colorsId" , usuario: "$usuarioId"},
+	     cantidad: { $sum: "$cantidad_res" }
+	    }}
+		  ], function(err, data) {
+		  	let newData = []
+		  	data.forEach(item => {
+		  		if(item._id.usuario == userId){
+		  			newData.push(item)
+		  		}
+		  	})
+		    if (err) cb(err); //return callback(err);
+		    cb(null, newData); //return callback(null, data);
+		  });
+		});
+	}
+
+	Producto.remoteMethod('stockPorUsuario', {
+    accepts: {arg: 'userId', type: 'string' },
+    returns: {arg:'data', type:['object'], root:true}
+  });
+
 	Producto.reducir = function(venta, cb){
 		let porReducir = venta.cantidad;
 		Producto.find({order: 'fecha_ingreso ASC', where: { and: [{modelosId: venta.modelo}, {colorsId: venta.color}, {tiposId: venta.tipo}, {marcasId: venta.marca}] }}, 
