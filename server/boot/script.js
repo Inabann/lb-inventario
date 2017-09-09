@@ -1,5 +1,5 @@
 module.exports = function(app) {
-  let created = true; //para q no se repita otra vez, cuando ya se ha creaedo un admin
+  let created = false; //para q no se repita otra vez "true", cuando ya se ha creaedo un admin
   if (!created) {
     var User = app.models.usuario;
     var Role = app.models.Role;

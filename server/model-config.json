@@ -14,61 +14,61 @@
     ]
   },
   "User": {
-    "dataSource": "mongo"
+    "dataSource": "mongoprod"
   },
   "AccessToken": {
-    "dataSource": "mongo",
+    "dataSource": "mongoprod",
     "public": false
   },
   "ACL": {
-    "dataSource": "mongo",
+    "dataSource": "mongoprod",
     "public": false
   },
   "RoleMapping": {
-    "dataSource": "mongo",
+    "dataSource": "mongoprod",
     "public": false,
     "options": {
       "strictObjectIDCoercion": true
     }
   },
   "Role": {
-    "dataSource": "mongo",
+    "dataSource": "mongoprod",
     "public": false
   },
   "usuario": {
-    "dataSource": "mongo",
+    "dataSource": "mongoprod",
     "public": true
   },
   "Cliente": {
-    "dataSource": "mongo",
+    "dataSource": "mongoprod",
     "public": true
   },
   "Venta": {
-    "dataSource": "mongo",
+    "dataSource": "mongoprod",
     "public": true
   },
   "Modelo": {
-    "dataSource": "mongo",
+    "dataSource": "mongoprod",
     "public": true
   },
   "Color": {
-    "dataSource": "mongo",
+    "dataSource": "mongoprod",
     "public": true
   },
   "Marca": {
-    "dataSource": "mongo",
+    "dataSource": "mongoprod",
     "public": true
   },
   "Tipo": {
-    "dataSource": "mongo",
+    "dataSource": "mongoprod",
     "public": true
   },
   "Producto": {
-    "dataSource": "mongo",
+    "dataSource": "mongoprod",
     "public": true
   },
   "DetalleVenta": {
-    "dataSource": "mongo",
+    "dataSource": "mongoprod",
     "public": true
   }
 }
