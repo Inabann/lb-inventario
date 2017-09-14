@@ -12,15 +12,6 @@
     "name": "mongo",
     "user": "dante",
     "connector": "mongodb"
-  },
-  "mongoprod": {
-    "host": "localhost",
-    "port": 27017,
-    "url": "",
-    "database": "inventario",
-    "password": "",
-    "name": "mongoprod",
-    "user": "",
-    "connector": "mongodb"
   }
+
 }

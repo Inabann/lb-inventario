@@ -1,12 +1,12 @@
 module.exports = function(app) {
-  let created = false; //para q no se repita otra vez "true", cuando ya se ha creaedo un admin
+  let created = true; //para q no se repita otra vez "true", cuando ya se ha creaedo un admin
   if (!created) {
     var User = app.models.usuario;
     var Role = app.models.Role;
     var RoleMapping = app.models.RoleMapping;
 
     User.create([
-      {username: 'admin',email: 'admin@gmail.com', password: 'admin'}
+      {username: 'almacen',email: 'almacen@gmail.com', password: 'admin'}
     ], function(err, users) {
       if (err) throw err;
 
@@ -34,3 +34,5 @@ module.exports = function(app) {
 
   
 };
+
+// 59b4413783ef363708753ff4 

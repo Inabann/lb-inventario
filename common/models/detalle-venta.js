@@ -219,7 +219,8 @@ module.exports = function(Detalleventa) {
         clienteId: 1,
         fecha_venta: 1,
         costo_envio: 1,
-        direccion: 1
+        direccion: 1,
+        usuarioId: 1
     	}},
     	{ $match : { year : y, month: mes } },
     	{
@@ -243,6 +244,17 @@ module.exports = function(Detalleventa) {
 	    },
 	    {
         $unwind: "$cliente"
+    	},
+    	{
+	    	$lookup: {
+          from: "usuario",
+          localField: "usuarioId",
+          foreignField: "_id",
+          as: "usuario"
+        }
+	    },
+	    {
+        $unwind: "$usuario"
     	},
 	    {
 	  		$sort : { fecha_venta: 1}
